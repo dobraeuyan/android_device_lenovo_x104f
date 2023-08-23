@@ -11,43 +11,66 @@ TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_VARIANT := generic
-TARGET_CPU_VARIANT_RUNTIME := generic
-
+TARGET_CPU_VARIANT := cortex-a7
+#TARGET_CPU_VARIANT_RUNTIME := generic
 TARGET_USES_64_BIT_BINDER := true
+
+# ANT+
+BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
 
 # APEX
 OVERRIDE_TARGET_FLATTEN_APEX := true
 
+# Bluetooth
+BOARD_HAVE_BLUETOOTH_QCOM := true
+QCOM_BT_USE_BTNV := true
+BLUETOOTH_HCI_USE_MCT := true
+
 # Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := LenovoTB-X104F
+TARGET_BOOTLOADER_BOARD_NAME := msm8909
 TARGET_NO_BOOTLOADER := true
 
 # Display
-TARGET_SCREEN_DENSITY := 160
+TARGET_SCREEN_DENSITY := 200
+BOARD_USES_ADRENO := true
+USE_OPENGL_RENDERER := true
+
+# Encryption
+TARGET_HW_DISK_ENCRYPTION := true
+TARGET_HW_KEYMASTER_V03 := true
+TARGET_KEYMASTER_WAIT_FOR_QSEE := true
+TARGET_PROVIDES_KEYMASTER := true
 
 # Kernel
 BOARD_KERNEL_BASE := 0x80000000
-BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci lpm_levels.sleep_disabled=1 androidboot.memcg=false earlyprintk buildvariant=user
+BOARD_KERNEL_CMDLINE := console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci lpm_levels.sleep_disabled=1 androidboot.memcg=false earlyprintk androidboot.selinux=permissive
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
-BOARD_KERNEL_IMAGE_NAME := Image
-TARGET_KERNEL_CONFIG := X104F_defconfig
+BOARD_KERNEL_IMAGE_NAME := zImage-dtb
+TARGET_KERNEL_CONFIG := lineage_X104F_defconfig
 TARGET_KERNEL_SOURCE := kernel/lenovo/X104F
 
-# Kernel - prebuilt
-TARGET_FORCE_PREBUILT_KERNEL := true
-ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilts/kernel
-endif
+# Manifest
+DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/manifest.xml
+DEVICE_MATRIX_FILE := $(DEVICE_PATH)/compatibility_matrix.xml
 
 # Partitions
-BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
+BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 13722924
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 33554432
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 2583691264
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 10923514368
+BOARD_CACHEIMAGE_PARTITION_SIZE := 115343360
+
+BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := ext4
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
+
+TARGET_USES_MKE2FS := true
 
 # Platform
 TARGET_BOARD_PLATFORM := msm8909
@@ -56,16 +79,19 @@ TARGET_BOARD_PLATFORM := msm8909
 TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 
+# QCOM
+BOARD_USES_QCOM_HARDWARE := true
+
 # Recovery
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.qcom
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
 
 # Security patch level
 VENDOR_SECURITY_PATCH := 2020-08-01
 
-# VINTF
-DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/manifest.xml
+# SELinux
+include device/qcom/sepolicy/sepolicy.mk
+BOARD_SEPOLICY_DIRS += \
+    $(PLATFORM_PATH)/sepolicy
 
 # Inherit the proprietary files
 include vendor/lenovo/X104F/BoardConfigVendor.mk
